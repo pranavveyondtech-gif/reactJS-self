@@ -1,0 +1,470 @@
+===============================
+REST API – IMPORTANT NOTES
+===============================
+
+--------------------------------
+1) MUST-KNOW HTTP STATUS CODES
+--------------------------------
+
+These are the most important HTTP status codes you MUST understand
+when working with APIs (Axios / Fetch / React).
+
+Code | Meaning                | When You See It / What To Do
+-------------------------------------------------------------
+200  | Success                | GET, PUT, PATCH, DELETE success
+201  | Created                | POST success (new data created)
+204  | No Content / Deleted   | DELETE success, no response body
+
+400  | Bad Request            | Invalid input → fix form data
+401  | Unauthorized           | Not logged in → redirect to login
+403  | Forbidden              | No permission → show access denied
+404  | Not Found              | API or page not found
+405  | Method Not Allowed     | Wrong HTTP method used
+
+422  | Validation Error       | Backend validation failed → show form errors
+500  | Server Error           | Backend issue → show generic error
+
+--------------------------------
+2) AXIOS ERROR HANDLING
+--------------------------------
+
+Axios automatically rejects promises for HTTP errors (4xx, 5xx).
+
+Important:
+- error.response is AXIOS-SPECIFIC
+- error.response is NOT related to variable names like res, response, etc.
+
+Basic Axios error check:
+
+catch (error) {
+  if (error.response) {
+    console.log("Status:", error.response.status);
+  } else if (error.request) {
+    console.log("No response from server (network error)");
+  } else {
+    console.log("Error:", error.message);
+  }
+}
+
+Real-world Axios status handling:
+
+catch (err) {
+  const status = err.response?.status;
+
+  if (status === 401) logout();
+  if (status === 403) showAccessDenied();
+  if (status === 422) showFormErrors(err.response.data);
+  if (status >= 500) showServerError();
+}
+
+--------------------------------
+3) FETCH ERROR HANDLING (VERY IMPORTANT)
+--------------------------------
+
+Fetch DOES NOT reject on HTTP errors.
+You must manually check response.ok.
+
+Key difference:
+- Axios → error.response.status
+- Fetch  → response.status
+
+Fetch pattern:
+
+const res = await fetch(url);
+
+if (!res.ok) {
+  throw {
+    status: res.status,
+    message: "Request failed",
+  };
+}
+
+return res.json();
+
+Handling fetch errors:
+
+catch (error) {
+  handleFetchError(error);
+}
+
+Example status handling with fetch:
+
+switch (error.status) {
+  case 400:
+    console.error("400 Bad Request:", error.message);
+    break;
+
+  case 422:
+    console.error("422 Validation Error:", error.errors);
+    break;
+}
+
+Important concept:
+- throw sends the error to the nearest catch
+- throw does NOT log anything automatically
+
+--------------------------------
+4) AXIOS vs FETCH (INTERVIEW LINE)
+--------------------------------
+
+“No, error.response is Axios-specific.
+Fetch does not reject on HTTP errors,
+so we must manually check response.ok.”
+
+--------------------------------
+5) REACT ROUTER (LOADER / ACTION)
+--------------------------------
+
+When using loaders and actions:
+- ❌ Do NOT pass props
+- ✅ Use hooks provided by React Router
+
+Data access:
+- useLoaderData()
+
+Error handling:
+- errorElement
+- useRouteError()
+
+Loader example:
+
+import { json } from "react-router-dom";
+
+export async function usersLoader() {
+  try {
+    const users = await apiFetch(
+      "https://jsonplaceholder.typicode.com/users"
+    );
+    return users;
+  } catch (error) {
+    throw json(
+      { message: error.message },
+      { status: error.status }
+    );
+  }
+}
+
+Route config:
+
+{
+  path: "/users",
+  element: <Users />,
+  loader: usersLoader,
+  errorElement: <ErrorPage />,
+}
+
+Error page example:
+
+import { useRouteError } from "react-router-dom";
+
+function ErrorPage() {
+  const error = useRouteError();
+
+  return (
+    <div>
+      <h2>Error</h2>
+      <p>{error.data?.message || error.message}</p>
+      <p>Status: {error.status}</p>
+    </div>
+  );
+}
+
+--------------------------------
+6) AXIOS INSTANCE (axios.create)
+--------------------------------
+
+axios.create() is used to create a reusable Axios instance
+with shared configuration.
+
+Example:
+
+const api = axios.create({
+  baseURL: "https://jsonplaceholder.typicode.com",
+  timeout: 5000,
+});
+
+Usage:
+
+api.get("/users");       // GET
+api.post("/users");     // POST
+api.put("/users/1");    // PUT
+api.delete("/users/1"); // DELETE
+
+Benefits:
+- Cleaner code
+- Centralized config
+- Easy to add interceptors later
+
+
+===============================
+HTTP METHODS & HEADERS
+===============================
+
+POST does NOT always mean "create new data".
+POST means "send data to the server for processing".
+
+--------------------------------
+HEADERS
+--------------------------------
+Headers are extra information sent with every HTTP request.
+
+✔ Headers are part of REST (not Axios or Fetch)
+✔ Axios may auto-set JSON headers sometimes
+✔ Most important header is Content-Type
+
+🔹 Content-Type (MOST IMPORTANT)
+Tells the server what data format you are sending.
+
+"Content-Type": "application/json"
+
+--------------------------------
+FETCH EXAMPLE (POST)
+--------------------------------
+fetch("/users", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: "John",
+  }),
+});
+
+--------------------------------
+AXIOS EXAMPLE (POST)
+--------------------------------
+axios.post(
+  "/users",
+  {
+    name: "John",
+  },
+  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }
+);
+
+===============================
+QUERY PARAMETERS
+===============================
+
+Query parameters are mainly used with GET requests.
+
+Used for:
+✔ Pagination
+✔ Filtering
+✔ Searching
+✔ Sorting
+
+--------------------------------
+COMMON QUERY PARAMS
+--------------------------------
+Pagination:
+- page
+- limit
+- offset
+
+Search & Filter:
+- search
+- filter
+
+Sorting:
+- sortBy
+- order (asc / desc)
+
+Offset defines how many records to skip before returning results.
+Usually used together with limit.
+
+--------------------------------
+EXAMPLE URL
+--------------------------------
+/users?page=1&limit=10
+
+--------------------------------
+AXIOS (GET with params)
+--------------------------------
+axios.get("/users", {
+  params: {
+    page: 1,
+    limit: 10,
+  },
+});
+
+--------------------------------
+FETCH (GET with query string)
+--------------------------------
+fetch(`/users?page=1&limit=10`);
+
+===============================
+AXIOS INSTANCE (IMPORTANT)
+===============================
+
+What is Axios Instance?
+
+We use Axios instance to centralize configuration and create
+service layers for clean, maintainable code.
+
+A pre-configured Axios object that contains:
+✔ baseURL
+✔ headers
+✔ timeout
+✔ interceptors (later)
+
+--------------------------------
+PROJECT STRUCTURE
+--------------------------------
+src/
+ ├─ api/
+ │   └─ axios.js
+ ├─ services/
+ │   └─ userService.js
+ └─ pages/
+     └─ Users.jsx
+
+--------------------------------
+STEP 1: CREATE AXIOS INSTANCE
+--------------------------------
+File: src/api/axios.js
+
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "https://jsonplaceholder.typicode.com",
+  timeout: 5000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export default api;
+
+✔ One-time configuration
+✔ Used everywhere
+
+--------------------------------
+STEP 2: CREATE SERVICE FILE
+--------------------------------
+File: src/services/userService.js
+
+import api from "../api/axios";
+
+export const getUsers = () => {
+  return api.get("/users");
+};
+
+export const getUserById = (id) => {
+  return api.get(`/users/${id}`);
+};
+
+✔ Business logic separated
+✔ Clean components
+
+--------------------------------
+STEP 3: USE IN COMPONENT
+--------------------------------
+File: Users.jsx
+
+import { useEffect, useState } from "react";
+import { getUsers } from "../services/userService";
+
+export default function Users() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    getUsers()
+      .then(res => setUsers(res.data))
+      .catch(err => console.error(err));
+  }, []);
+
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+===============================
+REACT TOASTIFY (IMPORTANT THEORY)
+===============================
+
+React Toastify is a library to show non-blocking
+notification messages (toasts).
+
+Used for:
+✔ Success messages
+✔ Error messages
+✔ Warning alerts
+✔ Info notifications
+✔ API response feedback
+
+--------------------------------
+WHY TOASTIFY IS IMPORTANT
+--------------------------------
+✔ Better UX than alert()
+✔ Does not block UI
+✔ Auto close & animations
+✔ Works perfectly with APIs & forms
+
+⚠ Toastify internally uses React Portal concepts
+
+
+=====================================================
+   1️⃣ React Suspense (IMPORTANT THEORY)
+   =====================================================
+
+   ⭐ Definition:
+   React Suspense allows you to show a fallback UI while:
+
+   - a component is loading
+   - data is loading
+   - code is loading (lazy loading)
+
+   👉 Meaning:
+   Suspense = "wait here and show something else"
+
+   -----------------------------------------------------
+   2️⃣ Lazy Loading (IMPORTANT THEORY)
+   -----------------------------------------------------
+
+   ⭐ Definition:
+   Lazy loading means:
+
+   - Load a component only when it’s needed
+   - Reduce initial bundle size
+   - Faster application load
+
+   🔥 Key Rules:
+   - lazy() MUST return a Promise
+   - The component MUST be a default export
+
+   -----------------------------------------------------
+   3️⃣ Example: React Suspense + Lazy Loading
+   -----------------------------------------------------
+
+
+import { Suspense, lazy, useState } from "react";
+
+/* Lazy-loaded components */
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+
+export default function App() {
+  const [showAbout, setShowAbout] = useState(false);
+
+  return (
+    <div>
+      <h1>React Suspense Demo</h1>
+
+      <button onClick={() => setShowAbout(false)}>Home</button>
+      <button onClick={() => setShowAbout(true)}>About</button>
+
+      {/* 🔥 Suspense Boundary */}
+      <Suspense fallback={<p>Loading...</p>}>
+        {showAbout ? <About /> : <Home />}
+      </Suspense>
+    </div>
+  );
+}
