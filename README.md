@@ -21,6 +21,23 @@ LIBRARIES
 - @hookform/resolvers
 - Axios
 
+- @reduxjs/toolkit
+  - createSlice
+  - createAsyncThunk
+  - configureStore
+  - Redux DevTools support
+
+- react-redux
+  - Provider
+  - useSelector
+  - useDispatch
+
+- redux-persist
+  - PersistGate
+  - persistReducer
+  - persistStore
+  - Persist Redux state across refresh/reload
+
 ===============================
 REACT HOOKS
 ===============================
@@ -48,6 +65,13 @@ Immer:
 
 Custom:
 - Custom Hooks
+
+===============================
+EXTENSIONS
+===============================
+
+- React Developer Tools (Browser Extension)
+- Redux DevTools (Browser Extension)
 
 ===============================
 ROUTING & UI UTILITIES

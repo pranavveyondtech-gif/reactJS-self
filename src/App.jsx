@@ -22,6 +22,7 @@ export default function App() {
         <NavLink to="/custom-hooks" style={styleLink}>Custom Hooks</NavLink> |{" "}
         <NavLink to="/axios" style={styleLink}>axios</NavLink> | {" "}
         <NavLink to="/toast" style={styleLink}>Toast</NavLink> | {" "}
+        <NavLink to="/redux" style={styleLink}>Redux</NavLink> | {" "}
       </nav>
 
       <hr />

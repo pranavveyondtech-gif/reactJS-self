@@ -11,13 +11,16 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.2",
     "immer": "^11.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.68.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.10.1",
     "react-toastify": "^11.0.5",
+    "redux-persist": "^6.0.0",
     "use-immer": "^0.11.0",
     "yup": "^1.7.1"
   },

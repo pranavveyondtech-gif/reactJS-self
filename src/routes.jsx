@@ -18,6 +18,7 @@ import AxiosPost from "./axios/AxiosPost.jsx";
 import Axios from "./axios/Axios.jsx";
 import AxiosPutPatch from "./axios/AxiosPutPatch.jsx";
 import ToastLayout from "./Toastify/ToastLayout.jsx";
+import Redux from "./redux/Redux.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
         ],
       },
       { path: "toast", Component: ToastLayout },
+      { path: "redux", Component: Redux },
     ],
   },
   { path: "reacthookform", Component: ReactHookForm },
