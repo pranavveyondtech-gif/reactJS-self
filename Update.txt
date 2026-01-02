@@ -1,15 +1,6 @@
-Update : 29-12-2025
+Update : 2-1-2026
 
-Task 1 : React modal
+Task 1 : Redux Toolkit
 status : Done
-
-Task 2: React Toastify
-status : Done
-
-Task 3: React Suspense, Lazy loading
-status: Done
-
-Task 4 : Basic of context api
-status: Done
 
 Thank you.
