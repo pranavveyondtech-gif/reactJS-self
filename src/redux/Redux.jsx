@@ -23,10 +23,10 @@ function Redux() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (value == 0) {
+    if (value === 0) {
       dispatch(fetchCounterValue());
     }
-  }, [dispatch, value]);
+  }, [dispatch,value]);
 
   return (
     <section style={{ padding: "20px" }}>

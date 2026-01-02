@@ -111,3 +111,12 @@ Action created (RTK auto) → reducer runs → store update → UI re-renders
 
 - Redux auto-manages `loading`, `error`, caching, refetching
 - You do **not** write reducers for API data
+
+
+
+
+Middleware is the place where Redux handles everything that reducers are NOT allowed to do
+
+createAsyncThunk, persist and RTK query is also middlewear
+
+middlewear is a middleman that works between action and reducer

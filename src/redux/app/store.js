@@ -1,17 +1,9 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
+import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import counterReducer from "../features/counter/counterSlice.js";
 import userReducer from "../features/user/userSlice.js";
+import counterApiMiddlewear from "../features/middlewear/counterApiMiddlewar.js";
 
 //  COMBINE REDUCERS
 const rootReducer = combineReducers({
@@ -34,11 +26,8 @@ export const store = configureStore({
   reducer: persistedReducer, //  use persistedReducer
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        // 🔹 ignore redux-persist actions
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+      serializableCheck: false,
+    }).concat(counterApiMiddlewear),
 });
 
 //  CREATE PERSISTOR
