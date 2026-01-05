@@ -3,4 +3,7 @@ Update : 2-1-2026
 Task 1 : Redux Toolkit
 status : Done
 
+Task 2 : React
+status : Done
+
 Thank you.
